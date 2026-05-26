@@ -20,3 +20,6 @@ BOOK_ANIM_DURATION = 1.2   # seconds
 COLOR_BOOK_COVER = (28, 18, 12)
 COLOR_BOOK_SPINE = (14, 9, 5)
 COLOR_BOOK_PAGE  = (195, 180, 148)
+
+COLOR_SPOOKY_TEXT = (180, 55, 55)   # muted dark red for unsettling answers
+COLOR_PAGE_TEXT   = (40, 30, 20)    # dark ink for text on warm page background
