@@ -67,14 +67,14 @@ def test_normal_on_high_roll(monkeypatch):
     assert isinstance(text, str) and text
 
 
-def test_boundary_0_05_is_not_jumpscare(monkeypatch):
-    monkeypatch.setattr(random, "random", lambda: 0.05)
+def test_boundary_0_10_is_not_jumpscare(monkeypatch):
+    monkeypatch.setattr(random, "random", lambda: 0.10)
     state, _ = pick_outcome()
     assert state != states.JUMPSCARE
 
 
-def test_boundary_0_17_is_normal(monkeypatch):
-    monkeypatch.setattr(random, "random", lambda: 0.17)
+def test_boundary_0_38_is_normal(monkeypatch):
+    monkeypatch.setattr(random, "random", lambda: 0.38)
     state, _ = pick_outcome()
     assert state == states.NORMAL_ANSWER
 

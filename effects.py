@@ -79,3 +79,25 @@ class JumpScare:
                     PUPIL_W, PUPIL_H,
                 )
                 pygame.draw.ellipse(surface, _PUPIL_COLOR, pupil)
+
+
+class StaticOverlay:
+    """TV-static noise drawn every frame over the spooky answer screen."""
+    _DENSITY    = 4500   # noise specks per frame
+    _PIXEL_SIZE = 2
+
+    def __init__(self):
+        self._surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+
+    def draw(self, surface):
+        self._surf.fill((0, 0, 0, 0))
+        w, h = SCREEN_WIDTH, SCREEN_HEIGHT
+        ps = self._PIXEL_SIZE
+        for _ in range(self._DENSITY):
+            x = random.randint(0, w - ps)
+            y = random.randint(0, h - ps)
+            # Full 0-255 range: dark specks show on light pages, bright specks on dark bg
+            v = random.randint(0, 255)
+            a = random.randint(60, 140)
+            self._surf.fill((v, v, v, a), (x, y, ps, ps))
+        surface.blit(self._surf, (0, 0))

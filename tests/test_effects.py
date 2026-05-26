@@ -1,5 +1,5 @@
 import pygame
-from effects import JumpScare, eye_rects, EYE_W, EYE_H, EYE_CX_OFFSET, Fader, flicker_bg
+from effects import JumpScare, eye_rects, EYE_W, EYE_H, EYE_CX_OFFSET, Fader, flicker_bg, StaticOverlay
 from constants import JUMPSCARE_DURATION, SCREEN_WIDTH, SCREEN_HEIGHT
 
 pygame.init()
@@ -128,3 +128,10 @@ def test_flicker_bg_no_channel_overflow():
     for _ in range(20):
         result = flicker_bg((252, 250, 253), intensity=10)
         assert all(0 <= c <= 255 for c in result)
+
+
+# --- StaticOverlay ---
+
+def test_static_overlay_draw_no_crash():
+    surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    StaticOverlay().draw(surf)

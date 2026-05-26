@@ -51,8 +51,8 @@ def pick_outcome():
         _spooky = load_answers(_SPOOKY_PATH, _FALLBACK_SPOOKY)
 
     roll = random.random()
-    if roll < 0.05:
+    if roll < 0.10:
         return states.JUMPSCARE, None
-    if roll < 0.17:
+    if roll < 0.38:
         return states.SPOOKY_ANSWER, random.choice(_spooky)
     return states.NORMAL_ANSWER, random.choice(_normal)

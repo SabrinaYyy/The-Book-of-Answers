@@ -4,7 +4,7 @@ import states
 import answers
 import audio
 from book import Book
-from effects import JumpScare, Fader, flicker_bg
+from effects import JumpScare, Fader, flicker_bg, StaticOverlay
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS,
     COLOR_BG, COLOR_BG_SPOOKY, COLOR_TEXT, COLOR_HINT, COLOR_SPOOKY_TEXT, COLOR_PAGE_TEXT,
@@ -54,6 +54,7 @@ def main():
     book = Book()
     jumpscare = JumpScare()
     fader = Fader()
+    static = StaticOverlay()
     current_state = states.START
     answer_text = None
     print(f"State: {current_state}")
@@ -135,6 +136,7 @@ def main():
             book.draw_answer(screen, answer_text, font, COLOR_SPOOKY_TEXT)
             _center_text(screen, "If you dare — press ENTER or R.",
                          font_hint, COLOR_HINT, BOOK_Y + BOOK_HEIGHT + 24)
+            static.draw(screen)
         elif current_state == states.RESTART:
             _center_text(screen, "Do you dare ask again?",
                          font, COLOR_TEXT, SCREEN_HEIGHT // 2 - 20)
