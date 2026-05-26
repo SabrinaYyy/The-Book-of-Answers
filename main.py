@@ -3,9 +3,10 @@ import pygame
 import states
 import answers
 from book import Book
+from effects import JumpScare, Fader, flicker_bg
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS,
-    COLOR_BG, COLOR_TEXT, COLOR_HINT, COLOR_SPOOKY_TEXT, COLOR_PAGE_TEXT,
+    COLOR_BG, COLOR_BG_SPOOKY, COLOR_TEXT, COLOR_HINT, COLOR_SPOOKY_TEXT, COLOR_PAGE_TEXT,
     FONT_PATH, FONT_SIZE_BODY, FONT_SIZE_HINT,
     BOOK_Y, BOOK_HEIGHT,
 )
@@ -16,7 +17,6 @@ _ENTER_TRANSITIONS = {
     states.NORMAL_ANSWER:  states.RESTART,
     states.SPOOKY_ANSWER:  states.RESTART,
     states.JUMPSCARE:      states.RESTART,
-    states.RESTART:        states.IDLE,
 }
 
 
@@ -25,7 +25,7 @@ def _load_font(size):
         return pygame.font.Font(FONT_PATH, size)
     except (FileNotFoundError, OSError):
         print(f"Warning: font not found at {FONT_PATH!r}, using serif fallback.")
-        return pygame.font.SysFont("serif", size)  # TODO: replace with gothic font
+        return pygame.font.SysFont("serif", size)  
 
 
 def _center_text(surface, text, font, color, y):
@@ -49,6 +49,8 @@ def main():
     font_hint = _load_font(FONT_SIZE_HINT)
 
     book = Book()
+    jumpscare = JumpScare()
+    fader = Fader()
     current_state = states.START
     answer_text = None
     print(f"State: {current_state}")
@@ -56,6 +58,7 @@ def main():
     running = True
     while running:
         dt = clock.tick(FPS) / 1000.0
+        prev_state = current_state
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -68,6 +71,10 @@ def main():
                         book.reset()
                         answer_text = None
                         current_state = _transition(current_state, states.OPENING_BOOK)
+                    elif current_state == states.RESTART:
+                        answer_text = None
+                        book.reset()
+                        current_state = _transition(current_state, states.IDLE)
                     else:
                         next_s = _ENTER_TRANSITIONS.get(current_state)
                         if next_s:
@@ -83,44 +90,55 @@ def main():
                 elif current_state in (states.NORMAL_ANSWER, states.SPOOKY_ANSWER):
                     current_state = _transition(current_state, states.RESTART)
                 elif current_state == states.RESTART:
+                    answer_text = None
+                    book.reset()
                     current_state = _transition(current_state, states.IDLE)
 
         # Time-driven transition: animation complete → pick real outcome
         if current_state == states.OPENING_BOOK and book.update(dt):
             outcome, answer_text = answers.pick_outcome()
             current_state = _transition(current_state, outcome)
+            if current_state == states.JUMPSCARE:
+                jumpscare.reset()
+
+        # Time-driven transition: jump scare complete → restart
+        if current_state == states.JUMPSCARE and jumpscare.update(dt):
+            current_state = _transition(current_state, states.RESTART)
+
+        if current_state != prev_state and current_state != states.JUMPSCARE:
+            fader.start()
+        fader.update(dt)
 
         # Draw
-        screen.fill(COLOR_BG)
+        screen.fill(flicker_bg(COLOR_BG_SPOOKY) if current_state == states.SPOOKY_ANSWER else COLOR_BG)
 
         if current_state == states.START:
-            _center_text(screen, "Think of a question in your head.",
+            _center_text(screen, "Clear your mind. Think of a question.",
                          font, COLOR_TEXT, SCREEN_HEIGHT // 2 - 30)
-            _center_text(screen, "Press ENTER when you are ready.",
+            _center_text(screen, "When you are ready — press ENTER.",
                          font_hint, COLOR_HINT, SCREEN_HEIGHT // 2 + 10)
         elif current_state in (states.IDLE, states.OPENING_BOOK):
             book.draw(screen, current_state)
             if current_state == states.IDLE:
-                _center_text(screen, "Press ENTER or click the book.",
+                _center_text(screen, "Press ENTER or click to open the book.",
                              font_hint, COLOR_HINT, BOOK_Y + BOOK_HEIGHT + 24)
         elif current_state == states.NORMAL_ANSWER:
             book.draw_answer(screen, answer_text, font, COLOR_PAGE_TEXT)
-            _center_text(screen, "Press ENTER or R to ask again.",
+            _center_text(screen, "Turn the page — press ENTER or R.",
                          font_hint, COLOR_HINT, BOOK_Y + BOOK_HEIGHT + 24)
         elif current_state == states.SPOOKY_ANSWER:
             book.draw_answer(screen, answer_text, font, COLOR_SPOOKY_TEXT)
-            _center_text(screen, "Press ENTER or R to ask again.",
+            _center_text(screen, "If you dare — press ENTER or R.",
                          font_hint, COLOR_HINT, BOOK_Y + BOOK_HEIGHT + 24)
         elif current_state == states.RESTART:
-            _center_text(screen, "Ask another question?",
+            _center_text(screen, "Do you dare ask again?",
                          font, COLOR_TEXT, SCREEN_HEIGHT // 2 - 20)
-            _center_text(screen, "Press ENTER to continue  \xb7  ESC to quit",
+            _center_text(screen, "Press ENTER to continue  \xb7  ESC to leave",
                          font_hint, COLOR_HINT, SCREEN_HEIGHT // 2 + 20)
         elif current_state == states.JUMPSCARE:
-            # Plan 6 will replace this with the real jump scare effect
-            _center_text(screen, "…", font, COLOR_SPOOKY_TEXT,
-                         (SCREEN_HEIGHT - font.get_linesize()) // 2)
+            jumpscare.draw(screen)
 
+        fader.draw(screen)
         pygame.display.flip()
 
     pygame.quit()

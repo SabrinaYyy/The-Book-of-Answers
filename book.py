@@ -4,10 +4,10 @@ from constants import (
     BOOK_X, BOOK_Y, BOOK_WIDTH, BOOK_HEIGHT,
     BOOK_ANIM_DURATION,
     COLOR_BOOK_COVER, COLOR_BOOK_SPINE, COLOR_BOOK_PAGE,
+    COLOR_BOOK_PAGE_SHADOW, COLOR_BOOK_COVER_EDGE,
 )
 
 _SPINE_W = 4
-_PAGE_SHADOW = (170, 155, 120)   # slightly darker page for depth
 
 
 class Book:
@@ -86,7 +86,7 @@ def _draw_open(surface, rect, text, font, text_color):
     """Draw both pages of the open book; render text on the right page."""
     left_page = pygame.Rect(rect.left, rect.top + 6, rect.width // 2 - 2, rect.height - 12)
     right_page = pygame.Rect(rect.centerx + 2, rect.top + 6, rect.width // 2 - 4, rect.height - 12)
-    pygame.draw.rect(surface, _PAGE_SHADOW, left_page, border_radius=1)
+    pygame.draw.rect(surface, COLOR_BOOK_PAGE_SHADOW, left_page, border_radius=1)
     pygame.draw.rect(surface, COLOR_BOOK_PAGE, right_page, border_radius=1)
     spine = pygame.Rect(rect.centerx - _SPINE_W // 2, rect.top, _SPINE_W, rect.height)
     pygame.draw.rect(surface, COLOR_BOOK_SPINE, spine)
@@ -98,7 +98,7 @@ def _draw_cover(surface, rect):
     pygame.draw.rect(surface, COLOR_BOOK_COVER, rect, border_radius=3)
     spine = pygame.Rect(rect.centerx - _SPINE_W // 2, rect.top, _SPINE_W, rect.height)
     pygame.draw.rect(surface, COLOR_BOOK_SPINE, spine)
-    pygame.draw.rect(surface, (50, 35, 20), rect, width=1, border_radius=3)
+    pygame.draw.rect(surface, COLOR_BOOK_COVER_EDGE, rect, width=1, border_radius=3)
 
 
 def _draw_opening(surface, rect, progress):
@@ -115,6 +115,6 @@ def _draw_opening(surface, rect, progress):
                 w,
                 rect.height - margin * 2,
             )
-            color = COLOR_BOOK_PAGE if i == 0 else _PAGE_SHADOW
+            color = COLOR_BOOK_PAGE if i == 0 else COLOR_BOOK_PAGE_SHADOW
             pygame.draw.rect(surface, color, page, border_radius=1)
     _draw_cover(surface, rect)
