@@ -2,6 +2,7 @@ import sys
 import pygame
 import states
 import answers
+import audio
 from book import Book
 from effects import JumpScare, Fader, flicker_bg
 from constants import (
@@ -42,6 +43,8 @@ def _transition(current, next_state):
 
 def main():
     pygame.init()
+    audio.init()
+    audio.play_bgm()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("The Book of Answers")
     clock = pygame.time.Clock()
@@ -100,10 +103,12 @@ def main():
             current_state = _transition(current_state, outcome)
             if current_state == states.JUMPSCARE:
                 jumpscare.reset()
+                audio.play_jumpscare()
 
         # Time-driven transition: jump scare complete → restart
         if current_state == states.JUMPSCARE and jumpscare.update(dt):
             current_state = _transition(current_state, states.RESTART)
+            audio.play_bgm()
 
         if current_state != prev_state and current_state != states.JUMPSCARE:
             fader.start()
