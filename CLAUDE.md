@@ -66,6 +66,12 @@ answer_book_game/
 
 # Rules
 
+## Workspace boundary
+- Only read, create, edit, or delete files inside this project directory.
+- Do not use `cd ..`.
+- Do not modify parent folders or other projects.
+- If a task seems to require files outside this directory, stop and ask first.
+
 ## Code quality
 - Never hardcode magic numbers — use constants.
 - Keep files under 150 lines when possible.

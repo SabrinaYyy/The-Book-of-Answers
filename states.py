@@ -1,0 +1,21 @@
+START = "START"
+IDLE = "IDLE"
+OPENING_BOOK = "OPENING_BOOK"
+NORMAL_ANSWER = "NORMAL_ANSWER"
+SPOOKY_ANSWER = "SPOOKY_ANSWER"
+JUMPSCARE = "JUMPSCARE"
+RESTART = "RESTART"
+
+_VALID = {
+    START:          {IDLE},
+    IDLE:           {OPENING_BOOK},
+    OPENING_BOOK:   {NORMAL_ANSWER, SPOOKY_ANSWER, JUMPSCARE},
+    NORMAL_ANSWER:  {RESTART},
+    SPOOKY_ANSWER:  {RESTART},
+    JUMPSCARE:      {RESTART},
+    RESTART:        {IDLE},
+}
+
+
+def is_valid(from_state, to_state):
+    return to_state in _VALID.get(from_state, set())
