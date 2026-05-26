@@ -3,17 +3,51 @@ import pygame
 import states
 import answers
 import audio
-from book import Book
+from book import Book, wrap_text
 from effects import JumpScare, Fader, flicker_bg, StaticOverlay
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS,
     COLOR_BG, COLOR_BG_SPOOKY, COLOR_TEXT, COLOR_HINT, COLOR_SPOOKY_TEXT, COLOR_PAGE_TEXT,
+    COLOR_DISCLAIMER_TEXT,
     FONT_PATH, FONT_SIZE_BODY, FONT_SIZE_HINT,
     BOOK_Y, BOOK_HEIGHT,
 )
 
+_DISC_PARAS = [
+    'This game is a fictional psychological horror experience inspired by "The Book of Answers."',
+    "All responses, messages, visual effects, and jump scares are randomly generated and are not supernatural, predictive, or personally directed at the player.",
+    "This game is intended purely for entertainment and atmosphere.",
+    "The game contains: flashing visuals \xb7 psychological horror themes \xb7 unsettling imagery \xb7 occasional jump scares.",
+    "Players with epilepsy, heart conditions, severe anxiety, or sensitivity to flashing lights or sudden sounds are advised to play with caution.",
+    "Player discretion is advised.",
+]
+
+
+def _draw_disclaimer(surface, font_body, font_hint, color, hint_color):
+    max_w = SCREEN_WIDTH - 200
+    lh = font_hint.get_linesize() + 3
+    lines = []
+    for para in _DISC_PARAS:
+        lines.extend(wrap_text(para, font_hint, max_w))
+        lines.append("")
+    if lines and not lines[-1]:
+        lines.pop()
+    total_h = lh * (len(lines) + 2)
+    y = max((SCREEN_HEIGHT - total_h) // 2, 20)
+    _center_text(surface, "DISCLAIMER", font_body, color, y)
+    y += lh * 2
+    for line in lines:
+        if line:
+            s = font_hint.render(line, True, hint_color)
+            surface.blit(s, ((SCREEN_WIDTH - s.get_width()) // 2, y))
+        y += lh
+    _center_text(surface, "Press ENTER or click to continue.",
+                 font_hint, hint_color, SCREEN_HEIGHT - 48)
+
+
 # ENTER key transitions for states without dedicated interaction logic
 _ENTER_TRANSITIONS = {
+    states.DISCLAIMER:     states.START,
     states.START:          states.IDLE,
     states.NORMAL_ANSWER:  states.RESTART,
     states.SPOOKY_ANSWER:  states.RESTART,
@@ -55,7 +89,7 @@ def main():
     jumpscare = JumpScare()
     fader = Fader()
     static = StaticOverlay()
-    current_state = states.START
+    current_state = states.DISCLAIMER
     answer_text = None
     print(f"State: {current_state}")
 
@@ -87,7 +121,9 @@ def main():
                     if current_state in (states.NORMAL_ANSWER, states.SPOOKY_ANSWER):
                         current_state = _transition(current_state, states.RESTART)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if current_state == states.IDLE and book.contains(event.pos):
+                if current_state == states.DISCLAIMER:
+                    current_state = _transition(current_state, states.START)
+                elif current_state == states.IDLE and book.contains(event.pos):
                     book.reset()
                     answer_text = None
                     current_state = _transition(current_state, states.OPENING_BOOK)
@@ -118,7 +154,9 @@ def main():
         # Draw
         screen.fill(flicker_bg(COLOR_BG_SPOOKY) if current_state == states.SPOOKY_ANSWER else COLOR_BG)
 
-        if current_state == states.START:
+        if current_state == states.DISCLAIMER:
+            _draw_disclaimer(screen, font, font_hint, COLOR_DISCLAIMER_TEXT, COLOR_DISCLAIMER_TEXT)
+        elif current_state == states.START:
             _center_text(screen, "Clear your mind. Think of a question.",
                          font, COLOR_TEXT, SCREEN_HEIGHT // 2 - 30)
             _center_text(screen, "When you are ready — press ENTER.",

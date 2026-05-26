@@ -24,6 +24,7 @@ COLOR_BOOK_PAGE        = (200, 184, 150)   # warm parchment
 COLOR_BOOK_PAGE_SHADOW = (165, 150, 115)   # darker left page for depth
 COLOR_BOOK_COVER_EDGE  = (55, 38, 20)      # thin border around cover
 
+COLOR_DISCLAIMER_TEXT = (245, 240, 235)  # near-white for disclaimer readability
 COLOR_SPOOKY_TEXT = (180, 55, 55)    # muted dark red for unsettling answers
 COLOR_PAGE_TEXT   = (40, 30, 20)     # dark ink for text on warm page background
 COLOR_BG_SPOOKY   = (14, 6, 8)      # faint red tinge during spooky answers
