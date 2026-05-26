@@ -18,7 +18,7 @@ BOOK_Y = (SCREEN_HEIGHT - BOOK_HEIGHT) // 2 - 20
 BOOK_ANIM_DURATION  = 1.2   # seconds
 JUMPSCARE_DURATION  = 2.0   # seconds the jump scare stays visible before RESTART
 
-COLOR_BOOK_COVER       = (30, 18, 10)      # deep warm brown cover
+COLOR_BOOK_COVER       = (64, 39, 23)#(30, 18, 10)      # deep warm brown cover
 COLOR_BOOK_SPINE       = (14, 9, 5)
 COLOR_BOOK_PAGE        = (200, 184, 150)   # warm parchment
 COLOR_BOOK_PAGE_SHADOW = (165, 150, 115)   # darker left page for depth
