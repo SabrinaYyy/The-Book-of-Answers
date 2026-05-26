@@ -30,8 +30,10 @@ def test_play_spooky_no_crash():
 
 
 def test_all_safe_when_mixer_disabled():
-    original = audio._mixer_ok
+    original_ok  = audio._mixer_ok
+    original_snd = audio._jumpscare_snd
     audio._mixer_ok = False
+    audio._jumpscare_snd = None
     try:
         audio.play_bgm()
         audio.stop_bgm()
@@ -39,4 +41,14 @@ def test_all_safe_when_mixer_disabled():
         audio.play_page_turn()
         audio.play_spooky()
     finally:
-        audio._mixer_ok = original
+        audio._mixer_ok      = original_ok
+        audio._jumpscare_snd = original_snd
+
+
+def test_play_jumpscare_safe_when_sound_missing():
+    original = audio._jumpscare_snd
+    audio._jumpscare_snd = None
+    try:
+        audio.play_jumpscare()  # should be a no-op, not a crash
+    finally:
+        audio._jumpscare_snd = original
