@@ -27,6 +27,7 @@ _FALLBACK_SPOOKY = [
 # Lazily loaded on first pick_outcome() call
 _normal = None
 _spooky = None
+_first_pick = True  # guarantees a normal answer on first open
 
 
 def load_answers(filepath, fallback):
@@ -44,11 +45,15 @@ def load_answers(filepath, fallback):
 
 def pick_outcome():
     """Return (state, text). text is None for JUMPSCARE."""
-    global _normal, _spooky
+    global _normal, _spooky, _first_pick
     if _normal is None:
         _normal = load_answers(_NORMAL_PATH, _FALLBACK_NORMAL)
     if _spooky is None:
         _spooky = load_answers(_SPOOKY_PATH, _FALLBACK_SPOOKY)
+
+    if _first_pick:
+        _first_pick = False
+        return states.NORMAL_ANSWER, random.choice(_normal)
 
     roll = random.random()
     if roll < 0.10:
